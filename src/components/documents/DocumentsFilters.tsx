@@ -21,6 +21,10 @@ export function DocumentsFilters({ onSearch, onFilter }: DocumentsFiltersProps) 
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [statusFilter, setStatusFilter] = useState("");
   const [dateFilter, setDateFilter] = useState("");
+  const [cityFilter, setCityFilter] = useState("");
+  const [regionFilter, setRegionFilter] = useState("");
+  const [reasonFilter, setReasonFilter] = useState("");
+  const [routeFilter, setRouteFilter] = useState("");
   
   const handleSearch = () => {
     onSearch(searchQuery);
@@ -29,13 +33,21 @@ export function DocumentsFilters({ onSearch, onFilter }: DocumentsFiltersProps) 
   const handleFilter = () => {
     onFilter({
       status: statusFilter,
-      date: dateFilter
+      dateRange: dateFilter,
+      city: cityFilter,
+      region: regionFilter,
+      reason: reasonFilter,
+      route: routeFilter
     });
   };
   
   const clearFilters = () => {
     setStatusFilter("");
     setDateFilter("");
+    setCityFilter("");
+    setRegionFilter("");
+    setReasonFilter("");
+    setRouteFilter("");
     onFilter({});
   };
 
@@ -45,7 +57,7 @@ export function DocumentsFilters({ onSearch, onFilter }: DocumentsFiltersProps) 
         <div className="relative flex-1">
           <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
           <Input
-            placeholder="Search invoices..."
+            placeholder="Search by invoice #, vendor, city, region..."
             className="pl-8"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
@@ -92,7 +104,72 @@ export function DocumentsFilters({ onSearch, onFilter }: DocumentsFiltersProps) 
             </Select>
           </div>
           
-          <div className="flex items-end gap-2">
+          <div className="space-y-2">
+            <label className="text-sm font-medium">City</label>
+            <Select value={cityFilter} onValueChange={setCityFilter}>
+              <SelectTrigger>
+                <SelectValue placeholder="Select city" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Cities</SelectItem>
+                <SelectItem value="Riyadh">Riyadh</SelectItem>
+                <SelectItem value="Jeddah">Jeddah</SelectItem>
+                <SelectItem value="Dammam">Dammam</SelectItem>
+                <SelectItem value="Medina">Medina</SelectItem>
+                <SelectItem value="Khobar">Khobar</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          
+          <div className="space-y-2">
+            <label className="text-sm font-medium">Region</label>
+            <Select value={regionFilter} onValueChange={setRegionFilter}>
+              <SelectTrigger>
+                <SelectValue placeholder="Select region" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Regions</SelectItem>
+                <SelectItem value="Central">Central</SelectItem>
+                <SelectItem value="Western">Western</SelectItem>
+                <SelectItem value="Eastern">Eastern</SelectItem>
+                <SelectItem value="Northern">Northern</SelectItem>
+                <SelectItem value="Southern">Southern</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          
+          <div className="space-y-2">
+            <label className="text-sm font-medium">Reason</label>
+            <Select value={reasonFilter} onValueChange={setReasonFilter}>
+              <SelectTrigger>
+                <SelectValue placeholder="Select reason" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Reasons</SelectItem>
+                <SelectItem value="Damaged Goods">Damaged Goods</SelectItem>
+                <SelectItem value="Quantity Mismatch">Quantity Mismatch</SelectItem>
+                <SelectItem value="Price Discrepancy">Price Discrepancy</SelectItem>
+                <SelectItem value="Late Delivery">Late Delivery</SelectItem>
+                <SelectItem value="Quality Issues">Quality Issues</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          
+          <div className="space-y-2">
+            <label className="text-sm font-medium">Route</label>
+            <Select value={routeFilter} onValueChange={setRouteFilter}>
+              <SelectTrigger>
+                <SelectValue placeholder="Select route" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Routes</SelectItem>
+                <SelectItem value="SAP">SAP Routes</SelectItem>
+                <SelectItem value="Mirnah">Mirnah Routes</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          
+          <div className="flex items-end gap-2 md:col-span-3">
             <Button className="flex-1" onClick={handleFilter}>Apply Filters</Button>
             <Button variant="outline" size="icon" onClick={clearFilters}>
               <X className="h-4 w-4" />

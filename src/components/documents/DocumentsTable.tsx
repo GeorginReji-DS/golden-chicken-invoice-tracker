@@ -15,18 +15,26 @@ import {
   ChevronsLeft, 
   ChevronsRight, 
   Download,
-  Eye
+  Eye,
+  RefreshCw,
+  Trash
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import {
   Pagination,
   PaginationContent,
-  PaginationEllipsis,
   PaginationItem,
   PaginationLink,
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { toast } from "@/hooks/use-toast";
 
 interface Document {
   id: string;
@@ -51,6 +59,22 @@ export function DocumentsTable({
   totalPages,
   onPageChange,
 }: DocumentsTableProps) {
+  const handleDeleteDocument = (id: string) => {
+    // In a real app, this would call an API
+    toast({
+      title: "Document Deleted",
+      description: `Document ${id} has been deleted.`,
+    });
+  };
+
+  const handleReprocessDocument = (id: string) => {
+    // In a real app, this would call an API
+    toast({
+      title: "Document Reprocessed",
+      description: `Document ${id} has been sent for reprocessing.`,
+    });
+  };
+
   return (
     <div className="space-y-4">
       <div className="rounded-md border">
@@ -90,13 +114,27 @@ export function DocumentsTable({
                 </TableCell>
                 <TableCell className="text-right">
                   <div className="flex justify-end gap-2">
-                    <Button asChild variant="outline" size="icon">
+                    <Button asChild variant="outline" size="icon" title="View">
                       <Link to={`/documents/${doc.id}`}>
                         <Eye className="h-4 w-4" />
                       </Link>
                     </Button>
-                    <Button variant="outline" size="icon">
-                      <Download className="h-4 w-4" />
+                    <Button 
+                      variant="outline" 
+                      size="icon" 
+                      onClick={() => handleReprocessDocument(doc.id)}
+                      title="Reprocess"
+                    >
+                      <RefreshCw className="h-4 w-4" />
+                    </Button>
+                    <Button 
+                      variant="outline" 
+                      size="icon" 
+                      className="text-red-500 hover:text-red-600"
+                      onClick={() => handleDeleteDocument(doc.id)}
+                      title="Delete"
+                    >
+                      <Trash className="h-4 w-4" />
                     </Button>
                   </div>
                 </TableCell>

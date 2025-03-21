@@ -15,14 +15,21 @@ const mockDocuments = Array.from({ length: 25 }, (_, i) => ({
     "Office Depot"
   ][Math.floor(Math.random() * 5)],
   amount: Number((Math.random() * 2000 + 100).toFixed(2)),
-  date: new Date(2023, 4, Math.floor(Math.random() * 30) + 1).toISOString().split('T')[0],
-  dueDate: new Date(2023, 5, Math.floor(Math.random() * 30) + 1).toISOString().split('T')[0],
-  status: ["approved", "pending", "rejected"][Math.floor(Math.random() * 3)] as "approved" | "pending" | "rejected"
+  date: new Date(2023, Math.floor(Math.random() * 12), Math.floor(Math.random() * 28) + 1).toISOString().split('T')[0],
+  dueDate: new Date(2023, Math.floor(Math.random() * 12), Math.floor(Math.random() * 28) + 1).toISOString().split('T')[0],
+  status: ["approved", "pending", "rejected"][Math.floor(Math.random() * 3)] as "approved" | "pending" | "rejected",
+  city: ["Riyadh", "Jeddah", "Dammam", "Medina", "Khobar"][Math.floor(Math.random() * 5)],
+  region: ["Central", "Western", "Eastern", "Northern", "Southern"][Math.floor(Math.random() * 5)],
+  sapRoute: `SAP-${Math.floor(Math.random() * 9000) + 1000}`,
+  mirnahRoute: `MIR-${Math.floor(Math.random() * 9000) + 1000}`,
+  reason: ["Damaged Goods", "Quantity Mismatch", "Price Discrepancy", "Late Delivery", "Quality Issues"][Math.floor(Math.random() * 5)],
+  reconStatus: ["Not Reconciled", "Stamp", "GRN", "Manual"][Math.floor(Math.random() * 4)]
 }));
 
 const Documents = () => {
   const [filteredDocuments, setFilteredDocuments] = useState(mockDocuments);
   const [currentPage, setCurrentPage] = useState(1);
+  const [selectedDocuments, setSelectedDocuments] = useState<string[]>([]);
   const itemsPerPage = 10;
   
   const totalPages = Math.ceil(filteredDocuments.length / itemsPerPage);
@@ -40,7 +47,13 @@ const Documents = () => {
     
     const filtered = mockDocuments.filter(doc => 
       doc.invoiceNumber.toLowerCase().includes(query.toLowerCase()) ||
-      doc.vendorName.toLowerCase().includes(query.toLowerCase())
+      doc.vendorName.toLowerCase().includes(query.toLowerCase()) ||
+      doc.city.toLowerCase().includes(query.toLowerCase()) ||
+      doc.region.toLowerCase().includes(query.toLowerCase()) ||
+      doc.sapRoute.toLowerCase().includes(query.toLowerCase()) ||
+      doc.mirnahRoute.toLowerCase().includes(query.toLowerCase()) ||
+      doc.reason.toLowerCase().includes(query.toLowerCase()) ||
+      doc.reconStatus.toLowerCase().includes(query.toLowerCase())
     );
     
     setFilteredDocuments(filtered);
@@ -54,7 +67,39 @@ const Documents = () => {
       filtered = filtered.filter(doc => doc.status === filters.status);
     }
     
-    // Add more filter logic here
+    if (filters.city && filters.city !== 'all') {
+      filtered = filtered.filter(doc => doc.city === filters.city);
+    }
+    
+    if (filters.region && filters.region !== 'all') {
+      filtered = filtered.filter(doc => doc.region === filters.region);
+    }
+    
+    if (filters.dateRange && filters.dateRange !== 'all') {
+      // Handle date filtering based on the selected range
+      const today = new Date();
+      const filterDate = new Date();
+      
+      switch (filters.dateRange) {
+        case 'this-week':
+          filterDate.setDate(today.getDate() - 7);
+          break;
+        case 'this-month':
+          filterDate.setMonth(today.getMonth() - 1);
+          break;
+        case 'last-month':
+          filterDate.setMonth(today.getMonth() - 2);
+          filterDate.setDate(today.getDate() + 30);
+          break;
+        default:
+          break;
+      }
+      
+      filtered = filtered.filter(doc => {
+        const docDate = new Date(doc.date);
+        return docDate >= filterDate;
+      });
+    }
     
     setFilteredDocuments(filtered);
     setCurrentPage(1);
@@ -62,6 +107,19 @@ const Documents = () => {
   
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
+  };
+  
+  const handleSelectDocument = (id: string, isSelected: boolean) => {
+    if (isSelected) {
+      setSelectedDocuments([...selectedDocuments, id]);
+    } else {
+      setSelectedDocuments(selectedDocuments.filter(docId => docId !== id));
+    }
+  };
+  
+  const handleBulkAction = (action: 'share' | 'download') => {
+    // Handle bulk actions here
+    console.log(`${action} documents:`, selectedDocuments);
   };
 
   return (
