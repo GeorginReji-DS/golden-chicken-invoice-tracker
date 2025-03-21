@@ -36,20 +36,12 @@ export function Header({ className }: HeaderProps) {
     <header className={cn("border-b bg-white px-6 py-3", className)}>
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
-          {sidebarCollapsed && (
-            <div className="flex items-center mr-4">
-              <img 
-                src="https://goldenchickenfarms.fisa.cloud/css/images/gcf.png" 
-                alt="Golden Chicken Logo" 
-                className="h-10" 
-              />
-            </div>
-          )}
-          <div className={cn(
-            "font-bold text-xl text-brand flex items-center gap-2",
-            sidebarCollapsed ? "hidden" : "block"
-          )}>
-            <span className="hidden md:inline">Golden Chicken Farms Co.</span>
+          <div className="flex items-center mr-4">
+            <img 
+              src="https://goldenchickenfarms.fisa.cloud/css/images/gcf.png" 
+              alt="Golden Chicken Logo" 
+              className="h-10" 
+            />
           </div>
           <div className="hidden md:flex items-center space-x-2">
             <Button 
@@ -58,12 +50,6 @@ export function Header({ className }: HeaderProps) {
               onClick={() => navigate('/')}
             >
               Overview
-            </Button>
-            <Button 
-              variant="outline"
-              onClick={() => navigate('/documents')}
-            >
-              Document Status
             </Button>
           </div>
         </div>

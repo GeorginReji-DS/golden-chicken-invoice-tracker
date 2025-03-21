@@ -38,21 +38,21 @@ export function Sidebar({ className }: SidebarProps) {
       </Button>
       
       <div className="flex flex-col gap-6 p-4">
-        {expanded ? (
-          <div className="flex items-center justify-center">
+        <div className="flex items-center justify-center">
+          {expanded ? (
             <img 
               src="https://goldenchickenfarms.fisa.cloud/css/images/gcf.png" 
               alt="Golden Chicken Farms" 
               className="h-12 object-contain"
             />
-          </div>
-        ) : (
-          <div className="flex justify-center">
-            <div className="h-8 w-8 bg-brand rounded-md flex items-center justify-center">
-              <span className="text-white font-bold">GC</span>
-            </div>
-          </div>
-        )}
+          ) : (
+            <img 
+              src="https://goldenchickenfarms.fisa.cloud/css/images/gcf.png" 
+              alt="Golden Chicken Farms" 
+              className="h-8 object-contain"
+            />
+          )}
+        </div>
         
         <nav className="space-y-1">
           {menuItems.map((item) => {

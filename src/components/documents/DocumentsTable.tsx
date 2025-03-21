@@ -12,9 +12,6 @@ import { Badge } from "@/components/ui/badge";
 import { 
   ChevronLeft, 
   ChevronRight, 
-  ChevronsLeft, 
-  ChevronsRight, 
-  Download,
   Eye,
   RefreshCw,
   Trash
@@ -28,26 +25,29 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { toast } from "@/hooks/use-toast";
+import { Checkbox } from "@/components/ui/checkbox";
 
 interface Document {
   id: string;
   invoiceNumber: string;
   vendorName: string;
-  amount: number;
   date: string;
-  dueDate: string;
-  status: "approved" | "pending" | "rejected";
+  status: string;
+  sapInvoiceNo: string;
+  custId: string;
+  sapRoute: string;
+  salesMan: string;
+  region: string;
+  reconStatus: string;
+  reason: string;
 }
 
 interface DocumentsTableProps {
   documents: Document[];
+  selectedDocuments: string[];
+  onSelectDocument: (id: string, isSelected: boolean) => void;
+  onSelectAll: (checked: boolean) => void;
   currentPage: number;
   totalPages: number;
   onPageChange: (page: number) => void;
@@ -55,6 +55,9 @@ interface DocumentsTableProps {
 
 export function DocumentsTable({
   documents,
+  selectedDocuments,
+  onSelectDocument,
+  onSelectAll,
   currentPage,
   totalPages,
   onPageChange,
@@ -77,51 +80,67 @@ export function DocumentsTable({
 
   return (
     <div className="space-y-4">
-      <div className="rounded-md border">
+      <div className="overflow-x-auto">
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Invoice #</TableHead>
-              <TableHead>Vendor</TableHead>
-              <TableHead>Amount</TableHead>
-              <TableHead>Date</TableHead>
-              <TableHead>Due Date</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead className="text-right">Actions</TableHead>
+              <TableHead className="w-10">
+                <Checkbox 
+                  checked={documents.length > 0 && selectedDocuments.length === documents.length}
+                  onCheckedChange={onSelectAll}
+                />
+              </TableHead>
+              <TableHead>Inv No</TableHead>
+              <TableHead>Inv Date</TableHead>
+              <TableHead>Inv Type</TableHead>
+              <TableHead>SAP Inv No</TableHead>
+              <TableHead>Cust ID</TableHead>
+              <TableHead>Payer</TableHead>
+              <TableHead>Sales Man</TableHead>
+              <TableHead>Region</TableHead>
+              <TableHead>SAP Route</TableHead>
+              <TableHead>Recon</TableHead>
+              <TableHead>Reason</TableHead>
+              <TableHead>Action</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {documents.map((doc) => (
               <TableRow key={doc.id}>
+                <TableCell>
+                  <Checkbox 
+                    checked={selectedDocuments.includes(doc.id)}
+                    onCheckedChange={(checked) => onSelectDocument(doc.id, !!checked)}
+                  />
+                </TableCell>
                 <TableCell className="font-medium">{doc.invoiceNumber}</TableCell>
-                <TableCell>{doc.vendorName}</TableCell>
-                <TableCell>${doc.amount.toFixed(2)}</TableCell>
                 <TableCell>{doc.date}</TableCell>
-                <TableCell>{doc.dueDate}</TableCell>
+                <TableCell>{doc.status}</TableCell>
+                <TableCell>{doc.sapInvoiceNo}</TableCell>
+                <TableCell>{doc.custId}</TableCell>
+                <TableCell>{doc.vendorName}</TableCell>
+                <TableCell>{doc.salesMan}</TableCell>
+                <TableCell>{doc.region}</TableCell>
+                <TableCell>{doc.sapRoute}</TableCell>
                 <TableCell>
                   <Badge
                     variant="outline"
-                    className={
-                      doc.status === "approved"
-                        ? "border-green-500 text-green-500"
-                        : doc.status === "rejected"
-                        ? "border-red-500 text-red-500"
-                        : "border-yellow-500 text-yellow-500"
-                    }
+                    className="border-red-500 text-red-500"
                   >
-                    {doc.status.charAt(0).toUpperCase() + doc.status.slice(1)}
+                    {doc.reconStatus}
                   </Badge>
                 </TableCell>
-                <TableCell className="text-right">
-                  <div className="flex justify-end gap-2">
-                    <Button asChild variant="outline" size="icon" title="View">
+                <TableCell>{doc.reason}</TableCell>
+                <TableCell>
+                  <div className="flex gap-2">
+                    <Button asChild variant="outline" size="sm" title="View">
                       <Link to={`/documents/${doc.id}`}>
                         <Eye className="h-4 w-4" />
                       </Link>
                     </Button>
                     <Button 
                       variant="outline" 
-                      size="icon" 
+                      size="sm" 
                       onClick={() => handleReprocessDocument(doc.id)}
                       title="Reprocess"
                     >
@@ -129,7 +148,7 @@ export function DocumentsTable({
                     </Button>
                     <Button 
                       variant="outline" 
-                      size="icon" 
+                      size="sm"
                       className="text-red-500 hover:text-red-600"
                       onClick={() => handleDeleteDocument(doc.id)}
                       title="Delete"
@@ -144,73 +163,47 @@ export function DocumentsTable({
         </Table>
       </div>
       
-      <Pagination>
-        <PaginationContent>
-          <PaginationItem>
-            <Button 
-              variant="outline" 
-              size="icon" 
-              onClick={() => onPageChange(1)}
-              disabled={currentPage === 1}
-            >
-              <ChevronsLeft className="h-4 w-4" />
-            </Button>
-          </PaginationItem>
-          <PaginationItem>
-            <Button 
-              variant="outline" 
-              size="icon" 
-              onClick={() => onPageChange(currentPage - 1)}
-              disabled={currentPage === 1}
-            >
-              <ChevronLeft className="h-4 w-4" />
-            </Button>
-          </PaginationItem>
-          
-          {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
-            const pageNumber = currentPage <= 3 
-              ? i + 1 
-              : currentPage >= totalPages - 2
-                ? totalPages - 4 + i
-                : currentPage - 2 + i;
-                
-            if (pageNumber > 0 && pageNumber <= totalPages) {
-              return (
-                <PaginationItem key={pageNumber}>
-                  <PaginationLink
-                    isActive={currentPage === pageNumber}
-                    onClick={() => onPageChange(pageNumber)}
-                  >
-                    {pageNumber}
-                  </PaginationLink>
-                </PaginationItem>
-              );
-            }
-            return null;
-          })}
-          
-          <PaginationItem>
-            <Button 
-              variant="outline" 
-              size="icon" 
-              onClick={() => onPageChange(currentPage + 1)}
-              disabled={currentPage === totalPages}
-            >
-              <ChevronRight className="h-4 w-4" />
-            </Button>
-          </PaginationItem>
-          <PaginationItem>
-            <Button 
-              variant="outline" 
-              size="icon" 
-              onClick={() => onPageChange(totalPages)}
-              disabled={currentPage === totalPages}
-            >
-              <ChevronsRight className="h-4 w-4" />
-            </Button>
-          </PaginationItem>
-        </PaginationContent>
-      </Pagination>
+      <div className="flex justify-between items-center mt-4 px-4">
+        <div className="text-sm text-muted-foreground">
+          Showing {documents.length} of {documents.length} records
+        </div>
+        
+        <Pagination>
+          <PaginationContent>
+            <PaginationItem>
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={() => onPageChange(currentPage - 1)}
+                disabled={currentPage === 1}
+              >
+                Previous
+              </Button>
+            </PaginationItem>
+            
+            <PaginationItem>
+              <PaginationLink 
+                size="sm"
+                isActive={true}
+                className="bg-brand/10"
+              >
+                {currentPage}
+              </PaginationLink>
+            </PaginationItem>
+            
+            <PaginationItem>
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={() => onPageChange(currentPage + 1)}
+                disabled={currentPage === totalPages}
+              >
+                Next
+              </Button>
+            </PaginationItem>
+          </PaginationContent>
+        </Pagination>
+      </div>
     </div>
   );
 }
