@@ -9,7 +9,6 @@ import { Card, CardContent } from "@/components/ui/card";
 import { PdfViewer } from "@/components/invoice-detail/PdfViewer";
 import { HeaderDetailsTab } from "@/components/invoice-detail/HeaderDetailsTab";
 import { LineDetailsTab } from "@/components/invoice-detail/LineDetailsTab";
-import { DocumentStatusTab } from "@/components/invoice-detail/DocumentStatusTab";
 
 // Mock invoice data for the detail page
 const mockInvoice = {
@@ -22,7 +21,7 @@ const mockInvoice = {
   amount: 1501.22,
   date: "2025-03-08",
   dueDate: "2025-04-08",
-  status: "pending" as const,
+  status: "pending" as "approved" | "pending" | "rejected",
   sapRoute: "101203",
   mirnahRoute: "126011",
   customerName: "OTHAIM",
@@ -78,7 +77,7 @@ const InvoiceDetail = () => {
   const handleApprove = () => {
     setInvoice({
       ...invoice,
-      status: "approved" as const
+      status: "approved"
     });
     
     toast({
@@ -90,7 +89,7 @@ const InvoiceDetail = () => {
   const handleReject = () => {
     setInvoice({
       ...invoice,
-      status: "rejected" as const
+      status: "rejected"
     });
     
     toast({
@@ -109,26 +108,10 @@ const InvoiceDetail = () => {
       </div>
       
       <Tabs defaultValue="header-details" className="w-full">
-        <TabsList className="grid w-full grid-cols-4">
-          <TabsTrigger value="overview">Overview</TabsTrigger>
+        <TabsList className="grid w-full grid-cols-2">
           <TabsTrigger value="header-details">Header Details</TabsTrigger>
           <TabsTrigger value="line-details">Line Details</TabsTrigger>
-          <TabsTrigger value="document-status">Document Status</TabsTrigger>
         </TabsList>
-
-        <TabsContent value="overview" className="pt-4">
-          <div className="grid md:grid-cols-2 gap-6">
-            <Card>
-              <CardContent className="p-6">
-                <h2 className="text-xl font-semibold mb-4">Overview Content</h2>
-                <p>Dashboard and overview information would go here.</p>
-              </CardContent>
-            </Card>
-            <div className="h-[calc(100vh-240px)]">
-              <PdfViewer url={pdfUrl} />
-            </div>
-          </div>
-        </TabsContent>
         
         <TabsContent value="header-details" className="pt-4">
           <div className="grid md:grid-cols-2 gap-6">
@@ -150,10 +133,6 @@ const InvoiceDetail = () => {
               <PdfViewer url={pdfUrl} />
             </div>
           </div>
-        </TabsContent>
-        
-        <TabsContent value="document-status" className="pt-4">
-          <DocumentStatusTab />
         </TabsContent>
       </Tabs>
     </div>

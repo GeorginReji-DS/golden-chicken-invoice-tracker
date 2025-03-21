@@ -8,6 +8,8 @@ import { MainLayout } from "./components/layout/MainLayout";
 import Index from "./pages/Index";
 import Documents from "./pages/Documents";
 import InvoiceDetail from "./pages/InvoiceDetail";
+import Users from "./pages/Users";
+import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -23,6 +25,8 @@ const App = () => (
             <Route path="/" element={<Index />} />
             <Route path="/documents" element={<Documents />} />
             <Route path="/documents/:id" element={<InvoiceDetail />} />
+            <Route path="/users" element={<Users />} />
+            <Route path="/settings" element={<Settings />} />
           </Route>
           <Route path="*" element={<NotFound />} />
         </Routes>
