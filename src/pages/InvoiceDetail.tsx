@@ -1,59 +1,68 @@
 
 import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { InvoiceDetailTabs } from "@/components/invoice-detail/InvoiceDetailTabs";
-import { PdfViewer } from "@/components/invoice-detail/PdfViewer";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Card, CardContent } from "@/components/ui/card";
+import { PdfViewer } from "@/components/invoice-detail/PdfViewer";
+import { HeaderDetailsTab } from "@/components/invoice-detail/HeaderDetailsTab";
+import { LineDetailsTab } from "@/components/invoice-detail/LineDetailsTab";
+import { DocumentStatusTab } from "@/components/invoice-detail/DocumentStatusTab";
 
 // Mock invoice data for the detail page
 const mockInvoice = {
   id: "doc-1",
-  invoiceNumber: "INV-2023-101",
-  vendorName: "Sysco Foods",
+  invoiceNumber: "126011216158",
+  vendorName: "Golden Chicken Farms Co.",
   vendorAddress: "123 Supplier Street, Foodville, CA 94123",
   vendorPhone: "(555) 123-4567",
-  vendorEmail: "accounts@syscofoods.com",
-  amount: 1249.99,
-  date: "2023-05-12",
-  dueDate: "2023-06-11",
+  vendorEmail: "accounts@goldenchicken.com.sa",
+  amount: 1501.22,
+  date: "2025-03-08",
+  dueDate: "2025-04-08",
   status: "pending" as const,
+  sapRoute: "101203",
+  mirnahRoute: "126011",
+  customerName: "OTHAIM",
+  grnNumber: "25179879",
+  gcNameInGRN: "Golden Chicken Farms Co.",
+  grnValue: 1501.22,
+  customerNameInGRN: "Abdallah Al Othaim Markets",
+  reason: "",
+  creditNote: "",
+  comments: "",
   items: [
     {
       id: "item-1",
-      description: "Chicken Breast, Boneless - 20lb box",
-      quantity: 10,
-      unitPrice: 45.99,
-      total: 459.90
+      slNo: 1,
+      outletCode: "214235",
+      inGrn: "IN",
+      description: "GOLDEN CHICKEN 1000G",
+      quantity: 12,
+      unitPrice: 15.6,
+      total: 187.2
     },
     {
       id: "item-2",
-      description: "Rice, Premium Long Grain - 25lb bag",
-      quantity: 8,
-      unitPrice: 32.50,
-      total: 260.00
+      slNo: 1,
+      outletCode: "214235",
+      inGrn: "GRN",
+      description: "GOLDEN CHICKEN 1000G",
+      quantity: 12,
+      unitPrice: 15.6,
+      total: 187.2
     },
     {
       id: "item-3",
-      description: "Vegetable Oil - 5 gallon",
-      quantity: 4,
-      unitPrice: 45.99,
-      total: 183.96
-    },
-    {
-      id: "item-4",
-      description: "Spice Mix, House Blend - 2lb container",
-      quantity: 6,
-      unitPrice: 18.99,
-      total: 113.94
-    },
-    {
-      id: "item-5",
-      description: "Delivery Fee",
-      quantity: 1,
-      unitPrice: 25.00,
-      total: 25.00
+      slNo: 2,
+      outletCode: "214245",
+      inGrn: "IN",
+      description: "GOLDEN CHICKEN 1100G",
+      quantity: 12,
+      unitPrice: 16.2,
+      total: 194.4
     }
   ]
 };
@@ -69,7 +78,7 @@ const InvoiceDetail = () => {
   const handleApprove = () => {
     setInvoice({
       ...invoice,
-      status: "approved"
+      status: "approved" as const
     });
     
     toast({
@@ -81,7 +90,7 @@ const InvoiceDetail = () => {
   const handleReject = () => {
     setInvoice({
       ...invoice,
-      status: "rejected"
+      status: "rejected" as const
     });
     
     toast({
@@ -99,18 +108,54 @@ const InvoiceDetail = () => {
         <h1 className="text-2xl font-semibold">Invoice #{invoice.invoiceNumber}</h1>
       </div>
       
-      <div className="grid md:grid-cols-2 gap-6">
-        <div>
-          <InvoiceDetailTabs 
-            invoice={invoice} 
-            onApprove={handleApprove} 
-            onReject={handleReject} 
-          />
-        </div>
-        <div className="h-[calc(100vh-240px)]">
-          <PdfViewer url={pdfUrl} />
-        </div>
-      </div>
+      <Tabs defaultValue="header-details" className="w-full">
+        <TabsList className="grid w-full grid-cols-4">
+          <TabsTrigger value="overview">Overview</TabsTrigger>
+          <TabsTrigger value="header-details">Header Details</TabsTrigger>
+          <TabsTrigger value="line-details">Line Details</TabsTrigger>
+          <TabsTrigger value="document-status">Document Status</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="overview" className="pt-4">
+          <div className="grid md:grid-cols-2 gap-6">
+            <Card>
+              <CardContent className="p-6">
+                <h2 className="text-xl font-semibold mb-4">Overview Content</h2>
+                <p>Dashboard and overview information would go here.</p>
+              </CardContent>
+            </Card>
+            <div className="h-[calc(100vh-240px)]">
+              <PdfViewer url={pdfUrl} />
+            </div>
+          </div>
+        </TabsContent>
+        
+        <TabsContent value="header-details" className="pt-4">
+          <div className="grid md:grid-cols-2 gap-6">
+            <HeaderDetailsTab 
+              invoice={invoice} 
+              onApprove={handleApprove} 
+              onReject={handleReject} 
+            />
+            <div className="h-[calc(100vh-240px)]">
+              <PdfViewer url={pdfUrl} />
+            </div>
+          </div>
+        </TabsContent>
+        
+        <TabsContent value="line-details" className="pt-4">
+          <div className="grid md:grid-cols-2 gap-6">
+            <LineDetailsTab invoice={invoice} />
+            <div className="h-[calc(100vh-240px)]">
+              <PdfViewer url={pdfUrl} />
+            </div>
+          </div>
+        </TabsContent>
+        
+        <TabsContent value="document-status" className="pt-4">
+          <DocumentStatusTab />
+        </TabsContent>
+      </Tabs>
     </div>
   );
 };
